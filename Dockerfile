@@ -1,6 +1,4 @@
 # comes with python pre-installed
-FROM python:3.11-alpine
-WORKDIR /root
-COPY app.py .
-LABEL name="hello world"
-CMD ["python", "app.py"]
+FROM nginx:1.29.2-alpine
+COPY page.html flag.png /usr/share/nginx/html
+LABEL name="html page"
