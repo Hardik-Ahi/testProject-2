@@ -44,4 +44,5 @@ resource "aws_vpc_security_group_ingress_rule" "ingress" {
   ip_protocol = "tcp"
   cidr_ipv4 = "0.0.0.0/0"
   from_port = 0  # start of port range
+  to_port = 65535  # end of port range
 }
