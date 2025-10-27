@@ -1,10 +1,10 @@
 provider "aws" {
-  region = "ap-south-1"
+  region = var.AWS_REGION
 }
 
 resource "aws_instance" "demo" {
-  ami = "ami-0f9708d1cd2cfee41"
-  instance_type = "t3.micro"
+  ami = var.AWS_EC2_AMI
+  instance_type = var.AWS_EC2_TYPE
   key_name = aws_key_pair.keyPair.key_name
   vpc_security_group_ids = [ aws_security_group.allow_traffic.id ]
 
@@ -15,8 +15,8 @@ resource "aws_instance" "demo" {
   sudo service docker start
   sudo systemctl enable docker
   sudo usermod -aG docker ec2-user
-  sudo -u ec2-user docker pull ahihardik11/html:latest
-  sudo -u ec2-user docker run -d -p 9090:80 ahihardik11/html:latest
+  sudo -u ec2-user docker pull ${var.AWS_ID}.dkr.ecr.${var.AWS_REGION}.amazonaws.com/${var.AWS_ECR_REPO}:latest
+  sudo -u ec2-user docker run -d -p 9090:80 ${var.AWS_ID}.dkr.ecr.${var.AWS_REGION}.amazonaws.com/${var.AWS_ECR_REPO}:latest
   EOF
 }
 
