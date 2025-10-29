@@ -21,7 +21,7 @@ resource "aws_instance" "demo" {
   instance_type = var.AWS_EC2_TYPE
   key_name = aws_key_pair.keyPair.key_name
   vpc_security_group_ids = [ aws_security_group.allow_traffic.id ]
-  iam_instance_profile = aws_iam_instance_profile.instanceProfile.id
+  iam_instance_profile = aws_iam_instance_profile.instanceProfile.name
 
   user_data = <<-EOF
   #!/bin/bash
@@ -30,12 +30,9 @@ resource "aws_instance" "demo" {
   sudo service docker start
   sudo systemctl enable docker
   sudo usermod -aG docker ec2-user
-  sudo echo "[default]" > $HOME/.aws/credentials
-  sudo echo "aws_access_key_id = ${var.AWS_ACCESS_KEY_ID}" >> $HOME/.aws/credentials
-  sudo echo "aws_secret_access_key = ${var.AWS_SECRET_ACCESS_KEY}" >> $HOME/.aws/credentials
-  sudo -u ec2-user aws ecr get-login-password --region ${var.AWS_REGION} | docker login --username AWS --password-stdin ${var.AWS_ID}.dkr.ecr.${var.AWS_REGION}.amazonaws.com
-  sudo -u ec2-user docker pull ${var.AWS_ID}.dkr.ecr.${var.AWS_REGION}.amazonaws.com/${var.AWS_ECR_REPO}:latest
-  sudo -u ec2-user docker run -d -p 9090:80 ${var.AWS_ID}.dkr.ecr.${var.AWS_REGION}.amazonaws.com/${var.AWS_ECR_REPO}:latest
+  sudo aws ecr get-login-password --region ${var.AWS_REGION} | docker login --username AWS --password-stdin ${var.AWS_ID}.dkr.ecr.${var.AWS_REGION}.amazonaws.com
+  sudo docker pull ${var.AWS_ID}.dkr.ecr.${var.AWS_REGION}.amazonaws.com/${var.AWS_ECR_REPO}:latest
+  sudo docker run -d -p 9090:80 ${var.AWS_ID}.dkr.ecr.${var.AWS_REGION}.amazonaws.com/${var.AWS_ECR_REPO}:latest
   EOF
 }
 
