@@ -2,11 +2,26 @@ provider "aws" {
   region = var.AWS_REGION
 }
 
+resource "aws_iam_role_policy" "ecrAccessPolicy" {
+  role = aws_iam_role.ecrAccess.name
+  policy = data.aws_iam_policy_document.instance_ecr_access_policy.json
+}
+
+resource "aws_iam_role" "ecrAccess" {
+  assume_role_policy = data.aws_iam_policy_document.instance_assume_role_policy.json  // just 'sts:AssumeRole' permission
+  name = "ecrAccessRole"
+}
+
+resource "aws_iam_instance_profile" "instanceProfile" {
+  role = aws_iam_role.ecrAccess.name
+}
+
 resource "aws_instance" "demo" {
   ami = var.AWS_EC2_AMI
   instance_type = var.AWS_EC2_TYPE
   key_name = aws_key_pair.keyPair.key_name
   vpc_security_group_ids = [ aws_security_group.allow_traffic.id ]
+  iam_instance_profile = aws_iam_instance_profile.instanceProfile.id
 
   user_data = <<-EOF
   #!/bin/bash
@@ -15,6 +30,10 @@ resource "aws_instance" "demo" {
   sudo service docker start
   sudo systemctl enable docker
   sudo usermod -aG docker ec2-user
+  sudo echo "[default]" > $HOME/.aws/credentials
+  sudo echo "aws_access_key_id = ${var.AWS_ACCESS_KEY_ID}" >> $HOME/.aws/credentials
+  sudo echo "aws_secret_access_key = ${var.AWS_SECRET_ACCESS_KEY}" >> $HOME/.aws/credentials
+  sudo -u ec2-user aws ecr get-login-password --region ${var.AWS_REGION} | docker login --username AWS --password-stdin ${var.AWS_ID}.dkr.ecr.${var.AWS_REGION}.amazonaws.com
   sudo -u ec2-user docker pull ${var.AWS_ID}.dkr.ecr.${var.AWS_REGION}.amazonaws.com/${var.AWS_ECR_REPO}:latest
   sudo -u ec2-user docker run -d -p 9090:80 ${var.AWS_ID}.dkr.ecr.${var.AWS_REGION}.amazonaws.com/${var.AWS_ECR_REPO}:latest
   EOF
@@ -23,15 +42,6 @@ resource "aws_instance" "demo" {
 resource "aws_security_group" "allow_traffic" {
   name        = "allow_traffic"
   description = "Allow all inbound traffic"
-}
-
-
-output "ip" {
-  value = aws_instance.demo.public_ip
-}
-
-output "id" {
-  value = aws_instance.demo.id
 }
 
 resource "aws_key_pair" "keyPair" {

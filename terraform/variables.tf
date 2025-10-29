@@ -17,3 +17,14 @@ variable "AWS_EC2_TYPE" {
 variable "AWS_ECR_REPO" {
   default = "aws-test/first-repo"
 }
+
+// take these from OS environment variables
+variable "AWS_ACCESS_KEY_ID" {
+  type = string
+  sensitive = true
+}
+
+variable "AWS_SECRET_ACCESS_KEY" {
+  type = string
+  sensitive = true
+}
