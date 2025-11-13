@@ -51,7 +51,7 @@ resource "aws_security_group" "allow_traffic" {
 
 resource "aws_key_pair" "keyPair" {
   key_name = "public-key-ec2"
-  public_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEBkEfAiTo4isYALYxDm5Uv04VZ3TLwfI1luOTMugIee ahiha@AcerNitro5"
+  public_key = file("$HOME/ssh_key.pub")
 }
 
 resource "aws_security_group_rule" "ingress" {
