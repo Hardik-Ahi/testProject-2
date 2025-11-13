@@ -1,3 +1,11 @@
+terraform {
+  backend "s3" {
+    bucket = "bucket-aws-aws-bucket"
+    key = "root/state"
+    region = "ap-south-1"
+  }
+}
+
 provider "aws" {
   region = var.AWS_REGION
 }
