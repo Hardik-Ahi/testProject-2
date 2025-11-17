@@ -38,8 +38,9 @@ resource "aws_instance" "demo" {
   sudo service docker start
   sudo systemctl enable docker
   sudo usermod -aG docker ec2-user
-  sudo docker pull ahihardik11/html:latest
-  sudo docker run -d -p 9090:80 ahihardik11/html:latest
+  sudo aws ecr get-login-password --region ${var.AWS_REGION} | docker login --username AWS --password-stdin ${var.AWS_ID}.dkr.ecr.${var.AWS_REGION}.amazonaws.com
+  sudo docker pull ${var.AWS_ID}.dkr.ecr.${var.AWS_REGION}.amazonaws.com/${var.AWS_ECR_REPO}:latest
+  sudo docker run -d -p 9090:80 ${var.AWS_ID}.dkr.ecr.${var.AWS_REGION}.amazonaws.com/${var.AWS_ECR_REPO}:latest
   EOF
 }
 
