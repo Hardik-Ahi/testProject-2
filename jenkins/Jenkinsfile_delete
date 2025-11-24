@@ -1,0 +1,21 @@
+pipeline {
+    agent any
+    options {
+        timeout(time: 20, unit: 'MINUTES')
+    }
+    stages {
+        stage('Checkout repo') {
+            steps {
+                checkout scmGit(
+                branches: [[name: 'master']],
+                userRemoteConfigs: [[url: 'https://github.com/Hardik-Ahi/testProject-2.git']]
+                )
+            }
+        }
+        stage('Terraform destroy') {
+            steps {
+                sh 'cd terraform && terraform init && terraform destroy --auto-approve'
+            }
+        }
+    }
+}
