@@ -14,14 +14,14 @@ pipeline {
         }
         stage('Build Docker Image') {
             steps {
-                bat 'docker build -t html:latest .'
-                bat 'docker tag html:latest ahihardik11/html'
-                bat 'docker push ahihardik11/html:latest'
+                sh 'docker build -t html:latest .'
+                sh 'docker tag html:latest ahihardik11/html'
+                sh 'docker push ahihardik11/html:latest'
             }
         }
         stage('Terraform infrastructure') {
             steps {
-                bat 'cd terraform && terraform init && terraform apply --auto-approve'
+                sh 'cd terraform && terraform init && terraform apply --auto-approve'
             }
         }
     }
