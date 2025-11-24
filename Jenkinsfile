@@ -5,10 +5,12 @@ pipeline {
     }
     stages {
         stage('Checkout repo') {
-            checkout scmGit(
-            branches: [[name: 'master']],
-            userRemoteConfigs: [[url: 'https://github.com/Hardik-Ahi/testProject-2.git']]
-            )
+            steps {
+                checkout scmGit(
+                branches: [[name: 'master']],
+                userRemoteConfigs: [[url: 'https://github.com/Hardik-Ahi/testProject-2.git']]
+                )
+            }
         }
         stage('Build Docker Image') {
             steps {
