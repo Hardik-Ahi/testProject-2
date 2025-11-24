@@ -1,7 +1,7 @@
 terraform {
   backend "s3" {
     bucket = "bucket-aws-aws-bucket"
-    key = "root/state"
+    key = "root/dockerjob_state"
     region = "ap-south-1"
   }
 }
