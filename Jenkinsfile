@@ -1,15 +1,15 @@
 pipeline {
     agent any
-    parameters {
-        checkout scmGit(
-            branches: [[name: 'master']],
-            userRemoteConfigs: [[url: 'https://github.com/Hardik-Ahi/testProject-2.git']]
-        )
-    }
     options {
         timeout(time: 20, unit: 'MINUTES')
     }
     stages {
+        stage('Checkout repo') {
+            checkout scmGit(
+            branches: [[name: 'master']],
+            userRemoteConfigs: [[url: 'https://github.com/Hardik-Ahi/testProject-2.git']]
+            )
+        }
         stage('Build Docker Image') {
             steps {
                 bat 'docker build -t html:latest .'
