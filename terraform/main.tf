@@ -31,9 +31,6 @@ resource "aws_instance" "demo" {
   vpc_security_group_ids = [ aws_security_group.allow_traffic.id ]
   iam_instance_profile = aws_iam_instance_profile.instanceProfile.name
 
-  tags {
-    name = "DevOps_instance"
-  }
 
   user_data = <<-EOF
   #!/bin/bash
