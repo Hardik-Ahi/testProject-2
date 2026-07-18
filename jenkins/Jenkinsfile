@@ -3,6 +3,9 @@ pipeline {
     options {
         timeout(time: 20, unit: 'MINUTES')
     }
+    environment {
+        TF_IN_AUTOMATION = 'true'  // Run Terraform in automation mode
+    }
     stages {
         stage('Checkout repo') {
             steps {
@@ -21,7 +24,27 @@ pipeline {
         }
         stage('Terraform infrastructure') {
             steps {
-                sh 'cd terraform && terraform init && terraform apply --auto-approve'
+                dir('terraform') {
+                    script {
+                        sh 'terraform init'
+                        int checkCode = sh(
+                            script: 'terraform plan -detailed-exitcode',
+                            returnStatus: true
+                        )
+                        
+                        if (checkCode == 0) {
+                            echo "Infrastructure exists. Replacing EC2 instance"
+                            sh 'terraform plan -replace="aws_instance.demo" -input=false -out=tfplan'
+                        } else if (checkCode == 2) {
+                            echo "Infrastructure does not exist or is incomplete. Creating everything..."
+                            sh 'terraform plan -input=false -out=tfplan'
+                        } else {
+                            error "Terraform plan failed."
+                        }
+
+                        sh 'terraform apply -input=false tfplan'
+                    }
+                }
             }
         }
     }
