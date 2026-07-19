@@ -25,6 +25,7 @@ resource "aws_iam_instance_profile" "instanceProfile" {
 }
 
 resource "aws_instance" "demo" {
+  name = "devops_instance"
   ami = var.AWS_EC2_AMI
   instance_type = var.AWS_EC2_TYPE
   key_name = aws_key_pair.keyPair.key_name
